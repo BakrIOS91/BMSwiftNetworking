@@ -42,7 +42,8 @@ public extension Target {
     var kBaseURLComponents: URLComponents {
         var urlComponents = URLComponents()
         urlComponents.scheme = kAppScheme
-        
+        // Set the host, incorporating the main API path (if present) or an empty path
+        urlComponents.host = kAppHost
         // Set the host, incorporating the main API path if present
         if let apiPath = kMainAPIPath {
             urlComponents.path = "/" + apiPath // Add a leading slash for a valid path
