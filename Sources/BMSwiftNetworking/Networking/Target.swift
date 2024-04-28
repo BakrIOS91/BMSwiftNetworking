@@ -45,9 +45,9 @@ public extension Target {
         
         // Set the host, incorporating the main API path if present
         if let apiPath = kMainAPIPath {
-            urlComponents.host = kAppHost + apiPath
+            urlComponents.path = "/" + apiPath // Add a leading slash for a valid path
         } else {
-            urlComponents.host = kAppHost
+            urlComponents.path = "/" // Set an empty path explicitly
         }
         
         // Set the port if applicable
