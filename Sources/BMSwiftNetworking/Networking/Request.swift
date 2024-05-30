@@ -109,30 +109,30 @@ extension TargetRequest {
             body.append(boundaryData)
             
             switch value {
-                case .data(let data, let fileName, let mimeType):
-                    // Ensure content disposition and content type data can be converted to Data
-                    guard let contentDispositionData = "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(fileName)\"\r\n".data(using: .utf8),
-                          let contentTypeData = "Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8) else {
-                        throw APIError.stringConversionFailed
-                    }
-                    
-                    // Append content disposition, content type, file data, and end line data
-                    body.append(contentDispositionData)
-                    body.append(contentTypeData)
-                    body.append(data)
-                    body.append(endLineData)
-                    
-                case .text(let text):
-                    // Ensure text data and content disposition data can be converted to Data
-                    guard let textData = "\(text)".data(using: .utf8),
-                          let contentDispositionData = "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8) else {
-                        throw APIError.stringConversionFailed
-                    }
-                    
-                    // Append content disposition, text data, and end line data
-                    body.append(contentDispositionData)
-                    body.append(textData)
-                    body.append(endLineData)
+            case .data(let data, let fileName, let mimeType):
+                // Ensure content disposition and content type data can be converted to Data
+                guard let contentDispositionData = "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(fileName)\"\r\n".data(using: .utf8),
+                      let contentTypeData = "Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8) else {
+                    throw APIError.stringConversionFailed
+                }
+                
+                // Append content disposition, content type, file data, and end line data
+                body.append(contentDispositionData)
+                body.append(contentTypeData)
+                body.append(data)
+                body.append(endLineData)
+                
+            case .text(let text):
+                // Ensure text data and content disposition data can be converted to Data
+                guard let textData = "\(text)\r\n".data(using: .utf8),
+                      let contentDispositionData = "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8) else {
+                    throw APIError.stringConversionFailed
+                }
+                
+                // Append content disposition, text data, and end line data
+                body.append(contentDispositionData)
+                body.append(textData)
+                body.append(endLineData)
             }
         }
         
