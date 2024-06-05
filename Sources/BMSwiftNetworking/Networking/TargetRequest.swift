@@ -87,9 +87,5 @@ public protocol SuccessTargetType: TargetRequest { }
 public protocol ModelTargetType: TargetRequest {
     /// The Codable response type expected from the network request.
     associatedtype Response: Codable
-    var mockResponse: Response?  { get }
-}
-
-extension ModelTargetType {
-    var mockResponse: Response? { return nil }
+    var mockResponse: Response  { get }
 }
