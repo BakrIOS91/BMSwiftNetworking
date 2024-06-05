@@ -72,8 +72,17 @@ public extension SuccessTargetType {
             // Create URLRequest based on the target
             let urlRequest = try createRequest()
             
+            var urlSessionTask: URLSession {
+                if self.sslCertificates.isEmpty {
+                    return URLSession.shared
+                } else {
+                    let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                    return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+                }
+            }
+            
             // Perform the asynchronous network request
-            let (_, response) = try await URLSession.shared.data(for: urlRequest)
+            let (data, response) = try await urlSessionTask.data(for: urlRequest)
             
             // Check the HTTP status code
             guard let httpResponse = response as? HTTPURLResponse else {
