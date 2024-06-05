@@ -36,6 +36,9 @@ public protocol TargetRequest {
     
     /// The headers to be included in the request.
     var headers: [String: String] { get }
+    
+    /// SLLPining
+    var sslCertificates: [SecCertificate] { get }
 }
 
 /// Default implementation of `TargetRequest` protocol, providing a plain request task by default.
@@ -68,6 +71,9 @@ public extension TargetRequest {
     var mergedHeaders: [String: String] {
         return defaultHeaders.merging(headers) { (_, new) in new }
     }
+    
+    /// Default Sec Certificates
+    var sslCertificates: [SecCertificate] { return [] }
 }
 
 /// Protocol for a successful network request.
