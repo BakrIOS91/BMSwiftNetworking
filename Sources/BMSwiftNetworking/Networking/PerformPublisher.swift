@@ -22,16 +22,19 @@ public extension ModelTargetType {
     /// ```
     /// let publisher: AnyPublisher<YourModelType, Error> = yourModelTarget.performPublisher()
     /// ```
-    func performPublisher() -> AnyPublisher<Response, Error> {
-        return Future<Response, Error> { promise in
+    func performPublisher() -> AnyPublisher<Response, APIError> {
+        return Future<Response, APIError> { promise in
             Task {
                 do {
                     // Perform the asynchronous network request using performAsync
                     let result = try await performAsync()
                     promise(.success(result))
+                } catch let apiError as APIError {
+                    // Return an APIError if there was an issue with the network request or decoding
+                    promise(.failure(apiError))
                 } catch {
-                    // Return an error if there was an issue with the network request or decoding
-                    promise(.failure(error))
+                    // Handle any other unexpected errors
+                    promise(.failure(.httpError(statusCode: .clientError)))
                 }
             }
         }
@@ -54,16 +57,19 @@ public extension SuccessTargetType {
     /// ```
     /// let publisher: AnyPublisher<Void, Error> = yourSuccessTarget.performPublisher()
     /// ```
-    func performPublisher() -> AnyPublisher<Void, Error> {
-        return Future<Void, Error> { promise in
+    func performPublisher() -> AnyPublisher<Void, APIError> {
+        return Future<Void, APIError> { promise in
             Task {
                 do {
                     // Perform the asynchronous network request using performAsync
                     let result: Void = try await performAsync()
                     promise(.success(result))
+                } catch let apiError as APIError {
+                    // Return an APIError if there was an issue with the network request or decoding
+                    promise(.failure(apiError))
                 } catch {
-                    // Return an error if there was an issue with the network request or if the response is not successful
-                    promise(.failure(error))
+                    // Handle any other unexpected errors
+                    promise(.failure(.httpError(statusCode: .clientError)))
                 }
             }
         }

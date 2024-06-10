@@ -24,14 +24,17 @@ public extension ModelTargetType {
     /// ```
     ///
     /// - Throws: An error if there is an issue with the network request or decoding the response.
-    func performResult() async -> Result<Response, Error> {
+    func performResult() async -> Result<Response, APIError> {
         do {
             // Perform the asynchronous network request using performAsync
             let result = try await performAsync()
             return .success(result)
+        } catch let apiError as APIError {
+            // Return an APIError if there was an issue with the network request or decoding
+            return .failure(apiError)
         } catch {
-            // Return an error result if there was an issue with the network request or decoding
-            return .failure(error)
+            // Handle any other unexpected errors
+            return .failure(.httpError(statusCode: .clientError))
         }
     }
 }
@@ -53,14 +56,17 @@ public extension SuccessTargetType {
     /// ```
     ///
     /// - Throws: An error if there is an issue with the network request or if the response is not successful.
-    func performResult() async -> Result<Void, Error> {
+    func performResult() async -> Result<Void, APIError> {
         do {
             // Perform the asynchronous network request using performAsync
             let result: Void = try await performAsync()
             return .success(result)
+        } catch let apiError as APIError {
+            // Return an APIError if there was an issue with the network request or decoding
+            return .failure(apiError)
         } catch {
-            // Return an error result if there was an issue with the network request or if the response is not successful
-            return .failure(error)
+            // Handle any other unexpected errors
+            return .failure(.httpError(statusCode: .clientError))
         }
     }
 }
