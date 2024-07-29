@@ -111,7 +111,7 @@ public enum HTTPStatusCode: Int {
 /// Enum representing the types of errors that can occur in the network layer.
 ///
 /// This enum provides specific error cases for common issues that may arise during network requests.
-public enum APIError: Error {
+public enum APIError: Error, Equatable {
     /// Error indicating invalid URL formation.
     case invalidURL
     /// Error indicating failure in data conversion.
