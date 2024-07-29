@@ -126,6 +126,10 @@ public enum APIError: Error {
     case xmlEncodingFailed
     /// Not Supported SOAP Operation
     case notSupportedSOAPOperation
+    
+    public static func == (lhs: APIError, rhs: APIError) -> Bool {
+        return true
+    }
 }
 
 extension APIError: LocalizedError {
