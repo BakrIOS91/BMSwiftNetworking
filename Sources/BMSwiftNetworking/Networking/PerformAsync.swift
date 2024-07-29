@@ -16,6 +16,7 @@ public extension ModelTargetType {
     func performAsync() async throws -> Response {
         // Create URLRequest based on the target
         let urlRequest = try createRequest()
+        var httpResp: HTTPURLResponse = .init()
         do {
             
             var urlSessionTask: URLSession {
@@ -34,6 +35,7 @@ public extension ModelTargetType {
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw APIError.httpError(statusCode: .clientError)
             }
+            httpResp = httpResponse
             // Handle different status code ranges
             switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
                 case .success:
@@ -56,7 +58,7 @@ public extension ModelTargetType {
             }
         } catch {
             // Throw the encountered error
-            responseLogger(request: urlRequest, error: error)
+            responseLogger(request: urlRequest, response: httpResp, error: error)
             throw error
         }
     }

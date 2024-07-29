@@ -30,7 +30,7 @@ func requestLogger(request: URLRequest) {
 func responseLogger(request: URLRequest, responseData: Data? = nil ,response: HTTPURLResponse? = nil, error: Error? = nil) {
     print("############################## received Response ##############################")
     if let error = error {
-        print("❌ \(request.httpMethod ?? "") Request for \(request.url?.absoluteString ?? "") return Error: \(error.localizedDescription)")
+        print("❌ \(response?.statusCode ?? 400) \(request.httpMethod ?? "") Request for \(request.url?.absoluteString ?? "") return Error: \(error.localizedDescription)")
     }
     
     if let response = response {
