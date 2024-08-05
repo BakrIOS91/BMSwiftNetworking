@@ -74,6 +74,11 @@ public extension TargetRequest {
     
     /// Default Sec Certificates
     var sslCertificates: [SecCertificate] { return [] }
+    
+    /// Use this to check about internet connection
+    static var isConnectedToInternet: Bool {
+        return NetworkMonitor.shared.isReachable
+    }
 }
 
 /// Protocol for a successful network request.

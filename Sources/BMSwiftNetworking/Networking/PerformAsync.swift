@@ -14,52 +14,57 @@ public extension ModelTargetType {
     /// - Returns: The decoded response.
     /// - Throws: An error if there is an issue with the network request or decoding the response.
     func performAsync() async throws -> Response {
-        // Create URLRequest based on the target
-        let urlRequest = try createRequest()
-        var httpResp: HTTPURLResponse = .init()
-        do {
-            
-            var urlSessionTask: URLSession {
-                if self.sslCertificates.isEmpty {
-                    return URLSession.shared
-                } else {
-                    let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
-                    return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
-                }
-            }
-            
-            // Perform the asynchronous network request
-            let (data, response) = try await urlSessionTask.data(for: urlRequest)
-            
-            // Check the HTTP status code
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw APIError.httpError(statusCode: .clientError)
-            }
-            httpResp = httpResponse
-            // Handle different status code ranges
-            switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
-                case .success:
-                    // Decode the response using JSONDecoder
-                    let decoder = JSONDecoder()
-                    responseLogger(request: urlRequest, responseData: data,response: httpResponse)
-
-                    do {
-                        let decodedResponse = try decoder.decode(Response.self, from: data)
-                        // Return the decoded response
-                        return decodedResponse
-                    } catch {
-                        // Throw an error for decoding failures
-                        throw APIError.dataConversionFailed
+        // check if connected to internet
+        if Self.isConnectedToInternet {
+            // Create URLRequest based on the target
+            let urlRequest = try createRequest()
+            var httpResp: HTTPURLResponse = .init()
+            do {
+                
+                var urlSessionTask: URLSession {
+                    if self.sslCertificates.isEmpty {
+                        return URLSession.shared
+                    } else {
+                        let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                        return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
                     }
-                    
-                default:
-                    // Throw an error for other status codes
-                    throw APIError.httpError(statusCode: HTTPStatusCode(rawValue: httpResponse.statusCode) ?? .clientError)
+                }
+                
+                // Perform the asynchronous network request
+                let (data, response) = try await urlSessionTask.data(for: urlRequest)
+                
+                // Check the HTTP status code
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw APIError.httpError(statusCode: .clientError)
+                }
+                httpResp = httpResponse
+                // Handle different status code ranges
+                switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
+                    case .success:
+                        // Decode the response using JSONDecoder
+                        let decoder = JSONDecoder()
+                        responseLogger(request: urlRequest, responseData: data,response: httpResponse)
+                        
+                        do {
+                            let decodedResponse = try decoder.decode(Response.self, from: data)
+                            // Return the decoded response
+                            return decodedResponse
+                        } catch {
+                            // Throw an error for decoding failures
+                            throw APIError.dataConversionFailed
+                        }
+                        
+                    default:
+                        // Throw an error for other status codes
+                        throw APIError.httpError(statusCode: HTTPStatusCode(rawValue: httpResponse.statusCode) ?? .clientError)
+                }
+            } catch {
+                // Throw the encountered error
+                responseLogger(request: urlRequest, response: httpResp, error: error)
+                throw error
             }
-        } catch {
-            // Throw the encountered error
-            responseLogger(request: urlRequest, response: httpResp, error: error)
-            throw error
+        } else {
+            throw APIError.noNetwork
         }
     }
 }
@@ -70,39 +75,44 @@ public extension SuccessTargetType {
     ///
     /// - Throws: An error if there is an issue with the network request or if the response is not successful.
     func performAsync() async throws -> Void {
-        do {
-            // Create URLRequest based on the target
-            let urlRequest = try createRequest()
-            
-            var urlSessionTask: URLSession {
-                if self.sslCertificates.isEmpty {
-                    return URLSession.shared
-                } else {
-                    let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
-                    return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+        // check if connected to internet
+        if Self.isConnectedToInternet {
+            do {
+                // Create URLRequest based on the target
+                let urlRequest = try createRequest()
+                
+                var urlSessionTask: URLSession {
+                    if self.sslCertificates.isEmpty {
+                        return URLSession.shared
+                    } else {
+                        let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                        return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+                    }
                 }
+                
+                // Perform the asynchronous network request
+                let (data, response) = try await urlSessionTask.data(for: urlRequest)
+                
+                // Check the HTTP status code
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw APIError.httpError(statusCode: .clientError)
+                }
+                
+                // Handle different status code ranges
+                switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
+                    case .success:
+                        return ()
+                        
+                    default:
+                        // Throw an error for other status codes
+                        throw APIError.httpError(statusCode: HTTPStatusCode(rawValue: httpResponse.statusCode) ?? .clientError)
+                }
+            } catch {
+                // Throw the encountered error
+                throw error
             }
-            
-            // Perform the asynchronous network request
-            let (data, response) = try await urlSessionTask.data(for: urlRequest)
-            
-            // Check the HTTP status code
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw APIError.httpError(statusCode: .clientError)
-            }
-            
-            // Handle different status code ranges
-            switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
-                case .success:
-                    return ()
-                    
-                default:
-                    // Throw an error for other status codes
-                    throw APIError.httpError(statusCode: HTTPStatusCode(rawValue: httpResponse.statusCode) ?? .clientError)
-            }
-        } catch {
-            // Throw the encountered error
-            throw error
+        } else {
+            throw APIError.noNetwork
         }
     }
 }

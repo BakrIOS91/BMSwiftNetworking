@@ -126,6 +126,8 @@ public enum APIError: Error, Equatable {
     case xmlEncodingFailed
     /// Not Supported SOAP Operation
     case notSupportedSOAPOperation
+    // No Internet
+    case noNetwork
     
     public static func == (lhs: APIError, rhs: APIError) -> Bool {
         return true
@@ -149,8 +151,11 @@ extension APIError: LocalizedError {
                 return NSLocalizedString("XML encode Body Failed", comment: "")
             case .notSupportedSOAPOperation:
                 return NSLocalizedString("SOAP Operation Coming Soon", comment: "")
+            case .noNetwork:
+                return NSLocalizedString("No Internet Connection", comment: "")
         }
     }
 }
+
 
 
