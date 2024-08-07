@@ -55,6 +55,10 @@ public extension TargetRequest {
     var headers: [String: String] {
         return [:]
     }
+    /// Default authHeader
+    var autHeaders: [String: String] {
+        return [:]
+    }
     
     /// Default headers for the request.
     var defaultHeaders: [String: String] {
