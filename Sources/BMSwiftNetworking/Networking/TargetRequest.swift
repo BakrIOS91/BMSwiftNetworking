@@ -37,6 +37,9 @@ public protocol TargetRequest {
     /// The headers to be included in the request.
     var headers: [String: String] { get }
     
+    /// The headers to be included in the request.
+    var autHeaders: [String: String] { get }
+    
     /// SLLPining
     var sslCertificates: [SecCertificate] { get }
 }
@@ -69,7 +72,8 @@ public extension TargetRequest {
     /// If a header with the same key exists in both, the provided header takes precedence.
     /// - Returns: Merged headers.
     var mergedHeaders: [String: String] {
-        return defaultHeaders.merging(headers) { (_, new) in new }
+        var combinedHeaders = headers.merging(autHeaders) { (_, new) in new }
+        return defaultHeaders.merging(combinedHeaders) { (_, new) in new }
     }
     
     /// Default Sec Certificates
