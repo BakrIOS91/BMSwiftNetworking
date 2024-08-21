@@ -35,7 +35,7 @@ public protocol TargetRequest {
     var requestTask: RequestTask { get }
     
     /// The headers to be included in the request.
-    var headers: [String: String] { get set }
+    var headers: [String: String] { get }
     
     /// The headers to be included in the request.
     var autHeaders: [String: String] { get }
