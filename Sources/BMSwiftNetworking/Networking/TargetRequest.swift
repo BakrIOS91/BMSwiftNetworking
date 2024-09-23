@@ -64,7 +64,7 @@ public extension TargetRequest {
     var defaultHeaders: [String: String] {
         var headers: [String: String] = [:]
         headers["Content-Type"] = "application/json"
-        headers["Accept"] = "application/json"
+        headers["Accept"] = "*/*"
         return headers
     }
     
