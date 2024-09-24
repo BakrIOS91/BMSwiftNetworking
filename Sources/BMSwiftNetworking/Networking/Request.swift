@@ -54,14 +54,25 @@ extension TargetRequest {
                 }
                 
             case .encodedBody(let encodable):
-                // Set the request body as JSON from an Encodable type.
-                let encoder = JSONEncoder()
-                do {
-                    urlRequest.httpBody = try encoder.encode(encodable)
-                    urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                } catch {
-                    throw APIError.dataConversionFailed
-                }
+            // Set the request body as JSON from an Encodable type
+               let encoder = JSONEncoder()
+               do {
+                   // Encode the encodable object to JSON
+                   let requestBody = try encoder.encode(encodable)
+                   
+                   // Set the request body
+                   urlRequest.httpBody = requestBody
+                   
+                   // Set the Content-Length header (in bytes)
+                   let contentLength = String(requestBody.count)
+                   urlRequest.setValue(contentLength, forHTTPHeaderField: "Content-Length")
+                   
+                   // Set the Content-Type header to indicate the request body is JSON
+                   urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+               } catch {
+                   // Handle encoding failure
+                   throw APIError.dataConversionFailed
+               }
                 
             case .uploadFile(let uRL):
                 // Create a file upload request.
