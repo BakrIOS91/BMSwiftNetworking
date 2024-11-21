@@ -7,12 +7,12 @@
 
 import Foundation
 
-public enum AppEnvironment{
-    case development
-    case testing
-    case staging
-    case preProduction
-    case production
+public enum AppEnvironment: String {
+    case development = "Dev"
+    case testing = "Testing"
+    case staging = "Staging"
+    case preProduction = "PreProduction"
+    case production = "Production"
 }
 
 public enum RequestType {
