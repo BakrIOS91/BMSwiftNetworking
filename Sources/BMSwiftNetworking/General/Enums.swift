@@ -128,7 +128,9 @@ public enum APIError: Error, Equatable {
     case notSupportedSOAPOperation
     // No Internet
     case noNetwork
-    
+    /// Invalid Response.
+    case invalidResponse
+
     public static func == (lhs: APIError, rhs: APIError) -> Bool {
         return true
     }
@@ -153,6 +155,8 @@ extension APIError: LocalizedError {
                 return NSLocalizedString("SOAP Operation Coming Soon", comment: "")
             case .noNetwork:
                 return NSLocalizedString("No Internet Connection", comment: "")
+            case .invalidResponse:
+                return NSLocalizedString("Invalid Response", comment: "")
         }
     }
 }
