@@ -102,7 +102,7 @@ public extension ModelTargetType {
                      response = urlResponse
                      
                      // Move the file to the desired location
-                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, remoteURL: remoteURL)
+                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, response: urlResponse, remoteURL: remoteURL)
                  } else {
                      // Fallback for earlier iOS versions using completion handlers
                      let (downloadedURL, urlResponse): (URL, URLResponse) = try await withCheckedThrowingContinuation { continuation in
@@ -121,7 +121,7 @@ public extension ModelTargetType {
                  
                      response = urlResponse
                      // Move the file to the desired location
-                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, remoteURL: remoteURL)
+                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, response: urlResponse, remoteURL: remoteURL)
                  }
 
                  // Check the HTTP status code
@@ -156,10 +156,10 @@ public extension ModelTargetType {
      ///   - downloadedURL: The temporary URL of the downloaded file.
      ///   - remoteURL: The remote URL from which the file was downloaded.
      /// - Returns: The final destination URL of the file.
-     private func returnFinalDestinationURL(from downloadedURL: URL, remoteURL: URL) throws -> URL {
+    private func returnFinalDestinationURL(from downloadedURL: URL, response: URLResponse,remoteURL: URL) throws -> URL {
          // Get the MIME type or derive it from the URL
-         let mimeType = remoteURL.getMimeType()
-         let fileExtension = mimeType.fileExtension()
+        let mimeType = response.mimeType ?? remoteURL.getMimeType()
+        let fileExtension = mimeType.fileExtension()
 
          // Extract the original file name from the remote URL
          let originalFileName = remoteURL.lastPathComponent
