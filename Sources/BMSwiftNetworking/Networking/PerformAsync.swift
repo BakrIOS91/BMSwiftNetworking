@@ -67,6 +67,107 @@ public extension ModelTargetType {
             throw APIError.noNetwork
         }
     }
+    
+    /// Downloads a file and returns the local file URL.
+    ///
+    /// - Returns: A URL pointing to the downloaded file.
+    /// - Throws: An error if there is an issue with the network request.
+    func performDownload() async throws -> URL? {
+         // Check if connected to the internet
+         if Self.isConnectedToInternet {
+             // Create URLRequest based on the target
+             let urlRequest = try createRequest()
+             var httpResp: HTTPURLResponse = .init()
+             do {
+                 // Retrieve the remote URL from the URLRequest
+                 guard let remoteURL = urlRequest.url else {
+                     throw APIError.invalidURL // Create this error type as needed
+                 }
+
+                 var urlSessionTask: URLSession {
+                     if self.sslCertificates.isEmpty {
+                         return URLSession.shared
+                     } else {
+                         let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                         return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+                     }
+                 }
+
+                 let response: URLResponse
+                 let finalDestinationURL: URL
+
+                 if #available(iOS 15.0, *) {
+                     // Use async/await for iOS 15 or later
+                     let (downloadedURL, urlResponse) = try await urlSessionTask.download(for: urlRequest)
+                     response = urlResponse
+                     
+                     // Move the file to the desired location
+                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, remoteURL: remoteURL)
+                 } else {
+                     // Fallback for earlier iOS versions using completion handlers
+                     let (downloadedURL, urlResponse): (URL, URLResponse) = try await withCheckedThrowingContinuation { continuation in
+                         urlSessionTask.downloadTask(with: urlRequest) { localURL, urlResponse, error in
+                             if let error = error {
+                                 continuation.resume(throwing: error)
+                                 return
+                             }
+                             guard let localURL = localURL, let urlResponse = urlResponse else {
+                                 continuation.resume(throwing: APIError.invalidResponse)
+                                 return
+                             }
+                             continuation.resume(returning: (localURL, urlResponse))
+                         }.resume()
+                     }
+                 
+                     response = urlResponse
+                     // Move the file to the desired location
+                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, remoteURL: remoteURL)
+                 }
+
+                 // Check the HTTP status code
+                 guard let httpResponse = response as? HTTPURLResponse else {
+                     throw APIError.httpError(statusCode: .clientError)
+                 }
+                 httpResp = httpResponse
+                 // Validate the HTTP status code
+                 switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
+                 case .success:
+                     responseLogger(request: urlRequest, responseData: nil, response: httpResponse)
+
+                     return finalDestinationURL
+
+                 default:
+                     // Throw an error for other status codes
+                     throw APIError.httpError(statusCode: HTTPStatusCode(rawValue: httpResponse.statusCode) ?? .clientError)
+                 }
+             } catch {
+                 // Throw the encountered error
+                 responseLogger(request: urlRequest, response: httpResp, error: error)
+                 throw error
+             }
+         } else {
+             throw APIError.noNetwork
+         }
+     }
+
+     /// Saves a downloaded file to a desired location and returns the final URL.
+     ///
+     /// - Parameters:
+     ///   - downloadedURL: The temporary URL of the downloaded file.
+     ///   - remoteURL: The remote URL from which the file was downloaded.
+     /// - Returns: The final destination URL of the file.
+     private func returnFinalDestinationURL(from downloadedURL: URL, remoteURL: URL) throws -> URL {
+         // Get the MIME type or derive it from the URL
+         let mimeType = remoteURL.getMimeType()
+         let fileExtension = mimeType.fileExtension()
+
+         // Extract the original file name from the remote URL
+         let originalFileName = remoteURL.lastPathComponent
+         let destinationURL = FileManager.default.temporaryDirectory.appendingPathComponent(originalFileName)
+
+         return destinationURL
+     }
+
 }
 
 // Implement the perform extension on SuccessTargetType

@@ -37,6 +37,20 @@ public extension ModelTargetType {
             return .failure(.httpError(statusCode: .clientError))
         }
     }
+    
+    func performDownloadResult() async -> Result<URL?, APIError> {
+        do {
+            // Perform the asynchronous network request using performAsync
+            let result = try await performDownload()
+            return .success(result)
+        } catch let apiError as APIError {
+            // Return an APIError if there was an issue with the network request or decoding
+            return .failure(apiError)
+        } catch {
+            // Handle any other unexpected errors
+            return .failure(.httpError(statusCode: .clientError))
+        }
+    }
 }
 
 /// Extension for `SuccessTargetType` protocol providing a convenience method to perform an asynchronous
