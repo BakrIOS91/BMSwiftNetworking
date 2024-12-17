@@ -38,7 +38,7 @@ public extension ModelTargetType {
         }
     }
     
-    func performDownloadResult() async -> Result<URL?, APIError> {
+    func performDownloadResult() async -> Result<DownloadedFile?, APIError> {
         do {
             // Perform the asynchronous network request using performAsync
             let result = try await performDownload()

@@ -72,7 +72,7 @@ public extension ModelTargetType {
     ///
     /// - Returns: A URL pointing to the downloaded file.
     /// - Throws: An error if there is an issue with the network request.
-    func performDownload() async throws -> URL? {
+    func performDownload() async throws -> DownloadedFile? {
          // Check if connected to the internet
          if Self.isConnectedToInternet {
              // Create URLRequest based on the target
@@ -94,7 +94,7 @@ public extension ModelTargetType {
                  }
 
                  let response: URLResponse
-                 let finalDestinationURL: URL
+                 let downloadedFile: DownloadedFile
 
                  if #available(iOS 15.0, *) {
                      // Use async/await for iOS 15 or later
@@ -102,7 +102,7 @@ public extension ModelTargetType {
                      response = urlResponse
                      
                      // Move the file to the desired location
-                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, response: urlResponse, remoteURL: remoteURL)
+                     downloadedFile = DownloadedFile(downloadedURL: downloadedURL, response: urlResponse, remoteURL: remoteURL)
                  } else {
                      // Fallback for earlier iOS versions using completion handlers
                      let (downloadedURL, urlResponse): (URL, URLResponse) = try await withCheckedThrowingContinuation { continuation in
@@ -121,7 +121,7 @@ public extension ModelTargetType {
                  
                      response = urlResponse
                      // Move the file to the desired location
-                     finalDestinationURL = try returnFinalDestinationURL(from: downloadedURL, response: urlResponse, remoteURL: remoteURL)
+                     downloadedFile = DownloadedFile(downloadedURL: downloadedURL, response: urlResponse, remoteURL: remoteURL)
                  }
 
                  // Check the HTTP status code
@@ -133,8 +133,7 @@ public extension ModelTargetType {
                  switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
                  case .success:
                      responseLogger(request: urlRequest, responseData: nil, response: httpResponse)
-
-                     return finalDestinationURL
+                     return downloadedFile
 
                  default:
                      // Throw an error for other status codes
@@ -149,24 +148,6 @@ public extension ModelTargetType {
              throw APIError.noNetwork
          }
      }
-
-     /// Saves a downloaded file to a desired location and returns the final URL.
-     ///
-     /// - Parameters:
-     ///   - downloadedURL: The temporary URL of the downloaded file.
-     ///   - remoteURL: The remote URL from which the file was downloaded.
-     /// - Returns: The final destination URL of the file.
-    private func returnFinalDestinationURL(from downloadedURL: URL, response: URLResponse,remoteURL: URL) throws -> URL {
-         // Get the MIME type or derive it from the URL
-        let mimeType = response.mimeType ?? remoteURL.getMimeType()
-        let fileExtension = mimeType.fileExtension()
-
-         // Extract the original file name from the remote URL
-         let originalFileName = remoteURL.lastPathComponent
-         let destinationURL = FileManager.default.temporaryDirectory.appendingPathComponent(originalFileName + ".\(fileExtension)")
-         return destinationURL
-     }
-
 }
 
 // Implement the perform extension on SuccessTargetType
