@@ -163,8 +163,7 @@ public extension ModelTargetType {
 
          // Extract the original file name from the remote URL
          let originalFileName = remoteURL.lastPathComponent
-         let destinationURL = FileManager.default.temporaryDirectory.appendingPathComponent(originalFileName)
-
+         let destinationURL = FileManager.default.temporaryDirectory.appendingPathComponent(originalFileName + ".\(fileExtension)")
          return destinationURL
      }
 
