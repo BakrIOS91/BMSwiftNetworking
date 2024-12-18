@@ -8,9 +8,9 @@
 import Foundation
 
 public struct DownloadedFile {
-    let downloadedURL: URL?
-    let response: URLResponse?
-    let remoteURL: URL?
+    public let downloadedURL: URL?
+    public let response: URLResponse?
+    public let remoteURL: URL?
     
     public init(downloadedURL: URL? = nil, response: URLResponse? = nil, remoteURL: URL? = nil) {
         self.downloadedURL = downloadedURL
