@@ -25,7 +25,7 @@ let package = Package(
             name: "BMSwiftNetworking",
             swiftSettings: [
                 .define("SPM"),
-                .unsafeFlags(["-enable-library-evolution"])  // Enable library evolution
+                .enableExperimentalFeature("LibraryEvolution") // Official Swift 5.3+ flag
             ]
         ),
         .testTarget(
