@@ -7,14 +7,19 @@
 
 import Foundation
 
-public struct DownloadedFile {
+public struct DownloadedFile: Codable {
     public let downloadedURL: URL?
-    public let response: URLResponse?
+    public var response: URLResponse? = nil
     public let remoteURL: URL?
-    
+
     public init(downloadedURL: URL? = nil, response: URLResponse? = nil, remoteURL: URL? = nil) {
         self.downloadedURL = downloadedURL
         self.response = response
         self.remoteURL = remoteURL
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case downloadedURL
+        case remoteURL
     }
 }
