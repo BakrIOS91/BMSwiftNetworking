@@ -35,7 +35,7 @@ public protocol TargetRequest {
     var requestTask: RequestTask { get }
     
     /// The headers to be included in the request.
-    var headers: [String: String] { get }
+    var headers: [String: String] { set get }
     
     /// The headers to be included in the request.
     var autHeaders: [String: String] { get }
@@ -86,6 +86,12 @@ public extension TargetRequest {
     /// Use this to check about internet connection
     static var isConnectedToInternet: Bool {
         return NetworkMonitor.shared.isReachable
+    }
+    
+    
+    
+    mutating func updateHeaderValue(for key: String, with value: String){
+        headers[key] = value
     }
 }
 
