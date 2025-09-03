@@ -73,9 +73,11 @@ public enum HTTPStatusCode: Int {
     case success
     /// Redirection status codes (300-399).
     case redirection
+    /// Client error status codes (404).
+    case notFound
     /// Client error status codes (400-499).
     case notAuthorize
-    /// Client error status codes (400-499).
+    /// Client error status codes (401).
     case clientError
     /// Server error status codes (500-599).
     case serverError
@@ -97,6 +99,8 @@ public enum HTTPStatusCode: Int {
                 switch rawValue{
                     case 401:
                         self = .notAuthorize
+                    case 404:
+                        self = .notFound
                     default:
                         self = .clientError
                 }
