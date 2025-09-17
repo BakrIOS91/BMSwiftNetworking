@@ -34,4 +34,8 @@ public class NetworkMonitor {
     public func stopMonitoring() {
         monitor.cancel()
     }
+    
+    public func isNetworkReachable() -> Bool {
+        return isReachable || isReachableOnCellular
+    }
 }
