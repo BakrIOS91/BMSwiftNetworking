@@ -85,7 +85,7 @@ public extension TargetRequest {
     
     /// Use this to check about internet connection
     static var isConnectedToInternet: Bool {
-        return NetworkMonitor.shared.isReachable
+        return NetworkMonitor.shared.isNetworkReachable()
     }
 }
 

@@ -14,8 +14,15 @@ public class NetworkMonitor {
     private let queue = DispatchQueue(label: "NetworkMonitor")
     
     private var status: NWPath.Status = .requiresConnection
-    var isReachable: Bool { status == .satisfied }
-    var isReachableOnCellular: Bool = true
+    private var isCellular: Bool = false
+    
+    public var isReachable: Bool {
+        status == .satisfied
+    }
+    
+    public var isReachableOnCellular: Bool {
+        isReachable && isCellular
+    }
     
     private init () {
         monitor = NWPathMonitor()
@@ -23,19 +30,21 @@ public class NetworkMonitor {
     
     public func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
-            self?.status = path.status
-            self?.isReachableOnCellular = path.isExpensive
+            guard let self = self else { return }
+            
+            self.status = path.status
+            self.isCellular = path.status == .satisfied && path.isExpensive
         }
         monitor.start(queue: queue)
     }
-    
-    
     
     public func stopMonitoring() {
         monitor.cancel()
     }
     
+    /// Returns `true` if network is reachable via Wi-Fi **or** Cellular
     public func isNetworkReachable() -> Bool {
         return isReachable || isReachableOnCellular
     }
 }
+
