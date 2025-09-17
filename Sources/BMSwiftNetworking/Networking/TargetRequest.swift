@@ -76,7 +76,7 @@ public extension TargetRequest {
     /// If a header with the same key exists in both, the provided header takes precedence.
     /// - Returns: Merged headers.
     var mergedHeaders: [String: String] {
-        var combinedHeaders = headers.merging(autHeaders) { (_, new) in new }
+        let combinedHeaders = headers.merging(autHeaders) { (_, new) in new }
         return defaultHeaders.merging(combinedHeaders) { (_, new) in new }
     }
     
@@ -85,7 +85,7 @@ public extension TargetRequest {
     
     /// Use this to check about internet connection
     static var isConnectedToInternet: Bool {
-        return NetworkMonitor.shared.isNetworkReachable()
+        return NetworkMonitor.shared.isConnected
     }
 }
 

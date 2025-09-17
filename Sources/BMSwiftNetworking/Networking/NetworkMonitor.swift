@@ -5,49 +5,63 @@
 //
 
 import Network
-import Combine
+import SwiftUI
 
-public class NetworkMonitor: ObservableObject {
-    public static let shared = NetworkMonitor()
+class NetworkMonitor: ObservableObject {
+    static let shared = NetworkMonitor()
     
-    private let monitor: NWPathMonitor
-    private let queue = DispatchQueue.main
+    private let monitor = NWPathMonitor()
+    private let queue = DispatchQueue(label: "NetworkMonitor")
     
-    private var status: NWPath.Status = .requiresConnection
-    private var isCellular: Bool = false
+    @Published var isConnected: Bool = false
+    @Published var connectionType: ConnectionType = .unknown
     
-    /// Published connectivity states for observation
-    @Published public private(set) var isReachable: Bool = false
-    @Published public private(set) var isReachableOnWiFi: Bool = false
-    @Published public private(set) var isReachableOnCellular: Bool = false
-    
-    private init () {
-        monitor = NWPathMonitor()
+    enum ConnectionType {
+        case wifi
+        case cellular
+        case ethernet
+        case unknown
     }
     
-    public func startMonitoring() {
+    init() {
+        startMonitoring()
+    }
+    
+    func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
             
-            self.status = path.status
-            self.isCellular = path.status == .satisfied && path.isExpensive
-            
-            // Update observable properties on main thread
             DispatchQueue.main.async {
-                self.isReachable = self.status == .satisfied
-                self.isReachableOnCellular = self.status == .satisfied && self.isCellular
-                self.isReachableOnWiFi = self.status == .satisfied && !self.isCellular
+                self.isConnected = path.status == .satisfied
+                self.updateConnectionType(path)
             }
         }
+        
         monitor.start(queue: queue)
     }
     
-    public func stopMonitoring() {
+    func stopMonitoring() {
         monitor.cancel()
     }
     
-    /// Returns `true` if network is reachable via Wi-Fi **or** Cellular
-    public func isNetworkReachable() -> Bool {
-        return isReachableOnWiFi || isReachableOnCellular
+    private func updateConnectionType(_ path: NWPath) {
+        if path.usesInterfaceType(.wifi) {
+            connectionType = .wifi
+        } else if path.usesInterfaceType(.cellular) {
+            connectionType = .cellular
+        } else if path.usesInterfaceType(.wiredEthernet) {
+            connectionType = .ethernet
+        } else {
+            connectionType = .unknown
+        }
+    }
+    
+    // Function to check network status on demand
+    func checkNetworkStatus() -> Bool {
+        return isConnected
+    }
+    
+    deinit {
+        stopMonitoring()
     }
 }

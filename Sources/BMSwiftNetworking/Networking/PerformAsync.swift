@@ -172,7 +172,7 @@ public extension SuccessTargetType {
                 }
                 
                 // Perform the asynchronous network request
-                let (data, response) = try await urlSessionTask.data(for: urlRequest)
+                let (_, response) = try await urlSessionTask.data(for: urlRequest)
                 
                 // Check the HTTP status code
                 guard let httpResponse = response as? HTTPURLResponse else {
