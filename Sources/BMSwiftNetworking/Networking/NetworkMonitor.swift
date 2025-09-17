@@ -11,7 +11,7 @@ public class NetworkMonitor: ObservableObject {
     public static let shared = NetworkMonitor()
     
     private let monitor: NWPathMonitor
-    private let queue = DispatchQueue(label: "NetworkMonitor")
+    private let queue = DispatchQueue.main
     
     private var status: NWPath.Status = .requiresConnection
     private var isCellular: Bool = false
