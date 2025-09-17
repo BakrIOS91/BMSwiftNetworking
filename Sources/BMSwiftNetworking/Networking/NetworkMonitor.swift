@@ -1,13 +1,13 @@
 //
 //  NetworkMonitor.swift
 //
-//
-//  Created by Bakr mohamed on 05/08/2024.
+//  Created by Bakr Mohamed on 05/08/2024.
 //
 
 import Network
+import Combine
 
-public class NetworkMonitor {
+public class NetworkMonitor: ObservableObject {
     public static let shared = NetworkMonitor()
     
     private let monitor: NWPathMonitor
@@ -16,13 +16,10 @@ public class NetworkMonitor {
     private var status: NWPath.Status = .requiresConnection
     private var isCellular: Bool = false
     
-    public var isReachable: Bool {
-        status == .satisfied
-    }
-    
-    public var isReachableOnCellular: Bool {
-        isReachable && isCellular
-    }
+    /// Published connectivity states for observation
+    @Published public private(set) var isReachable: Bool = false
+    @Published public private(set) var isReachableOnWiFi: Bool = false
+    @Published public private(set) var isReachableOnCellular: Bool = false
     
     private init () {
         monitor = NWPathMonitor()
@@ -34,6 +31,13 @@ public class NetworkMonitor {
             
             self.status = path.status
             self.isCellular = path.status == .satisfied && path.isExpensive
+            
+            // Update observable properties on main thread
+            DispatchQueue.main.async {
+                self.isReachable = self.status == .satisfied
+                self.isReachableOnCellular = self.status == .satisfied && self.isCellular
+                self.isReachableOnWiFi = self.status == .satisfied && !self.isCellular
+            }
         }
         monitor.start(queue: queue)
     }
@@ -44,7 +48,6 @@ public class NetworkMonitor {
     
     /// Returns `true` if network is reachable via Wi-Fi **or** Cellular
     public func isNetworkReachable() -> Bool {
-        return isReachable || isReachableOnCellular
+        return isReachableOnWiFi || isReachableOnCellular
     }
 }
-
