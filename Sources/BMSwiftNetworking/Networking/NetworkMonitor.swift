@@ -7,27 +7,27 @@
 import Network
 import SwiftUI
 
-class NetworkMonitor: ObservableObject {
-    static let shared = NetworkMonitor()
+public class NetworkMonitor: ObservableObject {
+    public static let shared = NetworkMonitor()
     
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitor")
     
-    @Published var isConnected: Bool = false
-    @Published var connectionType: ConnectionType = .unknown
+    @Published public private(set) var isConnected: Bool = false
+    @Published public private(set) var connectionType: ConnectionType = .unknown
     
-    enum ConnectionType {
+    public enum ConnectionType {
         case wifi
         case cellular
         case ethernet
         case unknown
     }
     
-    init() {
+    public init() {
         startMonitoring()
     }
     
-    func startMonitoring() {
+    public func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
             
@@ -40,7 +40,7 @@ class NetworkMonitor: ObservableObject {
         monitor.start(queue: queue)
     }
     
-    func stopMonitoring() {
+    public func stopMonitoring() {
         monitor.cancel()
     }
     
@@ -56,8 +56,9 @@ class NetworkMonitor: ObservableObject {
         }
     }
     
-    // Function to check network status on demand
-    func checkNetworkStatus() -> Bool {
+    /// Checks the current network status
+    /// - Returns: Boolean indicating whether the device is connected to the network
+    public func checkNetworkStatus() -> Bool {
         return isConnected
     }
     
