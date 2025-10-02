@@ -41,7 +41,7 @@ public protocol TargetRequest {
     var autHeaders: [String: String] { get }
     
     /// SLLPining
-    var sslConfiguration: SSLPinningConfiguration?  { get }
+    var sslPinningConfiguration: SSLPinningConfiguration?  { get }
 }
 
 /// Default implementation of `TargetRequest` protocol, providing a plain request task by default.
@@ -81,7 +81,7 @@ public extension TargetRequest {
     }
     
     /// Default Sec Certificates
-    var sslConfiguration: SSLPinningConfiguration? { return nil }
+    var sslPinningConfiguration: SSLPinningConfiguration? { return nil }
     
     /// Use this to check about internet connection
     static var isConnectedToInternet: Bool {

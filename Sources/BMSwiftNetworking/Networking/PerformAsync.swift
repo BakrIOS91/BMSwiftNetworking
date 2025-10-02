@@ -22,7 +22,7 @@ public extension ModelTargetType {
             do {
                 
                 var urlSessionTask: URLSession {
-                    if let sslConfiguration = sslConfiguration {
+                    if let sslConfiguration = sslPinningConfiguration {
                         let sessionDelegate = SSLPinningURLSessionDelegate(configuration: sslConfiguration)
                         return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
                     } else {
@@ -85,7 +85,7 @@ public extension ModelTargetType {
                  }
 
                  var urlSessionTask: URLSession {
-                     if let sslConfiguration = sslConfiguration {
+                     if let sslConfiguration = sslPinningConfiguration {
                          let sessionDelegate = SSLPinningURLSessionDelegate(configuration: sslConfiguration)
                          return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
                      } else {
@@ -163,7 +163,7 @@ public extension SuccessTargetType {
                 let urlRequest = try createRequest()
                 
                 var urlSessionTask: URLSession {
-                    if let sslConfiguration = sslConfiguration {
+                    if let sslConfiguration = sslPinningConfiguration {
                         let sessionDelegate = SSLPinningURLSessionDelegate(configuration: sslConfiguration)
                         return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
                     } else {

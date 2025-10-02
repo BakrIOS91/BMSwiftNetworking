@@ -230,19 +230,19 @@ final class SSLPinningURLSessionDelegate: NSObject, URLSessionDelegate {
 /// Holds pinned certificates, pinned public key hashes, and host restrictions.
 public struct SSLPinningConfiguration {
     /// Whether SSL pinning is active.
-    let isEnabled: Bool
+    fileprivate let isEnabled: Bool
     
     /// If true, fallback to default handling when pinning fails.
-    let allowFallback: Bool
+    fileprivate let allowFallback: Bool
     
     /// Hosts for which SSL pinning applies.
-    let pinnedHosts: Set<String>
+    fileprivate let pinnedHosts: Set<String>
     
     /// SHA-256 hashes of trusted public keys, formatted as "sha256/HEX".
-    let pinnedPublicKeyHashes: Set<String>
+    fileprivate let pinnedPublicKeyHashes: Set<String>
     
     /// Certificates bundled with the app for certificate pinning.
-    let pinnedCertificates: [SecCertificate]
+    fileprivate let pinnedCertificates: [SecCertificate]
 
     /// Initializes a configuration for SSL pinning.
     /// - Parameters:
@@ -251,7 +251,7 @@ public struct SSLPinningConfiguration {
     ///   - pinnedHosts: Hosts that require pinning.
     ///   - pinnedPublicKeyHashes: Public key hashes (SHA-256).
     ///   - pinnedCertificates: Pinned certificates (optional).
-    init(
+    public init(
         isEnabled: Bool,
         allowFallback: Bool,
         pinnedHosts: Set<String>,
