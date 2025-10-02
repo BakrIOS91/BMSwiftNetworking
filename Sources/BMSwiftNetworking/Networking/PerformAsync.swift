@@ -22,11 +22,11 @@ public extension ModelTargetType {
             do {
                 
                 var urlSessionTask: URLSession {
-                    if self.sslCertificates.isEmpty {
-                        return URLSession.shared
-                    } else {
-                        let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                    if let sslConfiguration = sslConfiguration {
+                        let sessionDelegate = SSLPinningURLSessionDelegate(configuration: sslConfiguration)
                         return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+                    } else {
+                        return URLSession.shared
                     }
                 }
                 
@@ -85,11 +85,11 @@ public extension ModelTargetType {
                  }
 
                  var urlSessionTask: URLSession {
-                     if self.sslCertificates.isEmpty {
-                         return URLSession.shared
-                     } else {
-                         let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                     if let sslConfiguration = sslConfiguration {
+                         let sessionDelegate = SSLPinningURLSessionDelegate(configuration: sslConfiguration)
                          return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+                     } else {
+                         return URLSession.shared
                      }
                  }
 
@@ -163,11 +163,11 @@ public extension SuccessTargetType {
                 let urlRequest = try createRequest()
                 
                 var urlSessionTask: URLSession {
-                    if self.sslCertificates.isEmpty {
-                        return URLSession.shared
-                    } else {
-                        let sessionDelegate = SSLPinningURLSessionDelegate(sslCertificates: sslCertificates)
+                    if let sslConfiguration = sslConfiguration {
+                        let sessionDelegate = SSLPinningURLSessionDelegate(configuration: sslConfiguration)
                         return URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: nil)
+                    } else {
+                        return URLSession.shared
                     }
                 }
                 
