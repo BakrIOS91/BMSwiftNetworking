@@ -136,7 +136,21 @@ public enum APIError: Error, Equatable {
     case invalidResponse
 
     public static func == (lhs: APIError, rhs: APIError) -> Bool {
-        return true
+        switch (lhs, rhs) {
+        case (.invalidURL, .invalidURL),
+             (.dataConversionFailed, .dataConversionFailed),
+             (.stringConversionFailed, .stringConversionFailed),
+             (.invalidSoapMultipartRequest, .invalidSoapMultipartRequest),
+             (.xmlEncodingFailed, .xmlEncodingFailed),
+             (.notSupportedSOAPOperation, .notSupportedSOAPOperation),
+             (.noNetwork, .noNetwork),
+             (.invalidResponse, .invalidResponse):
+            return true
+        case (.httpError(let l), .httpError(let r)):
+            return l == r
+        default:
+            return false
+        }
     }
 }
 
