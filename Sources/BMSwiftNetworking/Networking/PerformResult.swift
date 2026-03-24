@@ -51,6 +51,35 @@ public extension ModelTargetType {
             return .failure(.httpError(statusCode: .clientError))
         }
     }
+    
+    /// Performs a recurring asynchronous network request and returns the stream of `Result` types.
+    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Returns: An `AsyncStream` yielding the continuous results.
+    func performResultStream(repeatingEveryMinutes minutes: Double) -> AsyncStream<Result<Response, APIError>> {
+        AsyncStream { continuation in
+            let task = Task {
+                // Fire immediately
+                let initialResult = await self.performResult()
+                continuation.yield(initialResult)
+                
+                while !Task.isCancelled {
+                    do {
+                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                    } catch {
+                        break // sleep interrupted, task cancelled
+                    }
+                    if Task.isCancelled { break }
+                    let result = await self.performResult()
+                    continuation.yield(result)
+                }
+                continuation.finish()
+            }
+            
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+            }
+        }
+    }
 }
 
 /// Extension for `SuccessTargetType` protocol providing a convenience method to perform an asynchronous
@@ -81,6 +110,35 @@ public extension SuccessTargetType {
         } catch {
             // Handle any other unexpected errors
             return .failure(.httpError(statusCode: .clientError))
+        }
+    }
+    
+    /// Performs a recurring asynchronous network request and returns the stream of `Result` types.
+    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Returns: An `AsyncStream` yielding the continuous results.
+    func performResultStream(repeatingEveryMinutes minutes: Double) -> AsyncStream<Result<Void, APIError>> {
+        AsyncStream { continuation in
+            let task = Task {
+                // Fire immediately
+                let initialResult = await self.performResult()
+                continuation.yield(initialResult)
+                
+                while !Task.isCancelled {
+                    do {
+                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                    } catch {
+                        break // sleep interrupted, task cancelled
+                    }
+                    if Task.isCancelled { break }
+                    let result = await self.performResult()
+                    continuation.yield(result)
+                }
+                continuation.finish()
+            }
+            
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+            }
         }
     }
 }

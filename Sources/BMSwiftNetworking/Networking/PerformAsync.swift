@@ -148,6 +148,35 @@ public extension ModelTargetType {
              throw APIError.noNetwork
          }
      }
+     
+    /// Performs a recurring asynchronous network request and returns a stream of responses.
+    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Returns: An `AsyncThrowingStream` supplying the response continuously.
+    func performAsyncStream(repeatingEveryMinutes minutes: Double) -> AsyncThrowingStream<Response, Error> {
+        AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    // Fire immediately
+                    let initialResponse = try await self.performAsync()
+                    continuation.yield(initialResponse)
+                    
+                    while !Task.isCancelled {
+                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                        if Task.isCancelled { break }
+                        let response = try await self.performAsync()
+                        continuation.yield(response)
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+            }
+        }
+    }
 }
 
 // Implement the perform extension on SuccessTargetType
@@ -194,6 +223,35 @@ public extension SuccessTargetType {
             }
         } else {
             throw APIError.noNetwork
+        }
+    }
+    
+    /// Performs a recurring asynchronous network request and returns a stream of Void.
+    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Returns: An `AsyncThrowingStream` supplying completion events continuously.
+    func performAsyncStream(repeatingEveryMinutes minutes: Double) -> AsyncThrowingStream<Void, Error> {
+        AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    // Fire immediately
+                    let initialResponse: Void = try await self.performAsync()
+                    continuation.yield(initialResponse)
+                    
+                    while !Task.isCancelled {
+                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                        if Task.isCancelled { break }
+                        let response: Void = try await self.performAsync()
+                        continuation.yield(response)
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            
+            continuation.onTermination = { @Sendable _ in
+                task.cancel()
+            }
         }
     }
 }

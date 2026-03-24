@@ -5,6 +5,7 @@
 //  Created by Bakr mohamed on 15/01/2024.
 //
 
+import Foundation
 import Combine
 
 /// Extension for `ModelTargetType` protocol providing a convenience method to perform an asynchronous
@@ -40,6 +41,21 @@ public extension ModelTargetType {
         }
         .eraseToAnyPublisher()
     }
+    
+    /// Performs a recurring asynchronous network request and returns the result as a Combine `AnyPublisher`.
+    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Returns: An `AnyPublisher` containing the decoded responses or an error.
+    func performPublisher(repeatingEveryMinutes minutes: Double) -> AnyPublisher<Response, APIError> {
+        let intervalSeconds = minutes * 60
+        return Timer.publish(every: intervalSeconds, on: .main, in: .common)
+            .autoconnect()
+            .prepend(Date())
+            .setFailureType(to: APIError.self)
+            .flatMap { _ in
+                self.performPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
 }
 
 /// Extension for `SuccessTargetType` protocol providing a convenience method to perform an asynchronous
@@ -74,5 +90,20 @@ public extension SuccessTargetType {
             }
         }
         .eraseToAnyPublisher()
+    }
+    
+    /// Performs a recurring asynchronous network request and returns the result as a Combine `AnyPublisher`.
+    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Returns: An `AnyPublisher` indicating success or an error.
+    func performPublisher(repeatingEveryMinutes minutes: Double) -> AnyPublisher<Void, APIError> {
+        let intervalSeconds = minutes * 60
+        return Timer.publish(every: intervalSeconds, on: .main, in: .common)
+            .autoconnect()
+            .prepend(Date())
+            .setFailureType(to: APIError.self)
+            .flatMap { _ in
+                self.performPublisher()
+            }
+            .eraseToAnyPublisher()
     }
 }
