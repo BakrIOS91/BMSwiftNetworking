@@ -45,6 +45,9 @@ public protocol TargetRequest {
     
     /// Interceptor to handle request and response
     var interceptor: NetworkInterceptor? { get }
+    
+    /// Use this to check about internet connection
+    static var isConnectedToInternet: Bool { get }
 }
 
 /// Default implementation of `TargetRequest` protocol, providing a plain request task by default.
