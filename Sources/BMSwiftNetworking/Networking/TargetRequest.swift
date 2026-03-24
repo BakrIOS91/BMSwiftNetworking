@@ -42,6 +42,9 @@ public protocol TargetRequest {
     
     /// SLLPining
     var sslPinningConfiguration: SSLPinningConfiguration?  { get }
+    
+    /// Interceptor to handle request and response
+    var interceptor: NetworkInterceptor? { get }
 }
 
 /// Default implementation of `TargetRequest` protocol, providing a plain request task by default.
@@ -82,6 +85,9 @@ public extension TargetRequest {
     
     /// Default Sec Certificates
     var sslPinningConfiguration: SSLPinningConfiguration? { return nil }
+    
+    /// Default interceptor
+    var interceptor: NetworkInterceptor? { return LoggerInterceptor() }
     
     /// Use this to check about internet connection
     static var isConnectedToInternet: Bool {

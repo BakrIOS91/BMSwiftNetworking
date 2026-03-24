@@ -43,7 +43,7 @@ public extension ModelTargetType {
                     case .success:
                         // Decode the response using JSONDecoder
                         let decoder = JSONDecoder()
-                        responseLogger(request: urlRequest, responseData: data,response: httpResponse)
+                        interceptor?.responseIntercept(request: urlRequest, responseData: data, response: httpResponse, error: nil)
                         
                         do {
                             let decodedResponse = try decoder.decode(Response.self, from: data)
@@ -60,7 +60,7 @@ public extension ModelTargetType {
                 }
             } catch {
                 // Throw the encountered error
-                responseLogger(request: urlRequest, response: httpResp, error: error)
+                interceptor?.responseIntercept(request: urlRequest, responseData: nil, response: httpResp, error: error)
                 throw error
             }
         } else {
@@ -132,7 +132,7 @@ public extension ModelTargetType {
                  // Validate the HTTP status code
                  switch HTTPStatusCode(rawValue: httpResponse.statusCode) {
                  case .success:
-                     responseLogger(request: urlRequest, responseData: nil, response: httpResponse)
+                     interceptor?.responseIntercept(request: urlRequest, responseData: nil, response: httpResponse, error: nil)
                      return downloadedFile
 
                  default:
@@ -141,7 +141,7 @@ public extension ModelTargetType {
                  }
              } catch {
                  // Throw the encountered error
-                 responseLogger(request: urlRequest, response: httpResp, error: error)
+                 interceptor?.responseIntercept(request: urlRequest, responseData: nil, response: httpResp, error: error)
                  throw error
              }
          } else {

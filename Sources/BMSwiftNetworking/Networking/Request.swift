@@ -31,7 +31,7 @@ extension TargetRequest {
                 try configureSOAPRequest(&urlRequest)
         }
         
-        requestLogger(request: urlRequest)
+        interceptor?.requestIntercept(urlRequest)
         
         return urlRequest
     }
