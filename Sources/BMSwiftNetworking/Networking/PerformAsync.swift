@@ -12,12 +12,6 @@ import Foundation
 public extension ModelTargetType {
 
     /// Performs an asynchronous network request and returns the decoded response or throws an error.
-    ///
-    /// In **SwiftUI Previews** (`XCODE_RUNNING_FOR_PREVIEWS == "1"`) the method returns
-    /// `mockResponse` immediately without making any network call.
-    ///
-    /// - Returns: The decoded response (or `mockResponse` in Previews).
-    /// - Throws: An error if there is an issue with the network request or decoding the response.
     func performAsync() async throws -> Response {
         // check if connected to internet
         if Self.isConnectedToInternet {
@@ -163,22 +157,8 @@ public extension ModelTargetType {
     }
 
     /// Performs a recurring asynchronous network request and returns a stream of responses.
-    ///
-    /// In **SwiftUI Previews** (`XCODE_RUNNING_FOR_PREVIEWS == "1"`) the stream yields
-    /// `mockResponse` once and finishes without making any network call.
-    ///
-    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
-    /// - Returns: An `AsyncThrowingStream` supplying the response continuously.
     func performAsyncStream(repeatingEveryMinutes minutes: Double) -> AsyncThrowingStream<Response, Error> {
         AsyncThrowingStream { continuation in
-            #if DEBUG
-            if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
-                continuation.yield(mockResponse)
-                continuation.finish()
-                return
-            }
-            #endif
-
             let task = Task {
                 do {
                     // Fire immediately
