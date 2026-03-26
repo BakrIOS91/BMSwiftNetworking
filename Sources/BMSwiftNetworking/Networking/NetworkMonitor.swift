@@ -32,15 +32,6 @@ public class NetworkMonitor: ObservableObject {
             guard let self = self else { return }
             
             DispatchQueue.main.async {
-                #if DEBUG
-                // In Previews or Tests, we often want to assume connectivity 
-                // especially if we are using MockURLProtocol.
-                if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" ||
-                    NSClassFromString("XCTestCase") != nil {
-                    self.isConnected = true
-                    return
-                }
-                #endif
                 
                 self.isConnected = path.status == .satisfied
                 self.updateConnectionType(path)

@@ -68,17 +68,9 @@ public extension ModelTargetType {
 
     /// Downloads a file and returns the local file URL.
     ///
-    /// In **SwiftUI Previews** (`XCODE_RUNNING_FOR_PREVIEWS == "1"`) the method returns
-    /// `nil` immediately without making any network call.
-    ///
-    /// - Returns: A `DownloadedFile` (or `nil` in Previews).
+    /// - Returns: A `DownloadedFile`.
     /// - Throws: An error if there is an issue with the network request.
     func performDownload() async throws -> DownloadedFile? {
-        #if DEBUG
-        if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
-            return nil
-        }
-        #endif
 
         // Check if connected to the internet
         if Self.isConnectedToInternet {
@@ -190,16 +182,8 @@ public extension SuccessTargetType {
 
     /// Performs an asynchronous network request and returns void if successful or throws an error.
     ///
-    /// In **SwiftUI Previews** (`XCODE_RUNNING_FOR_PREVIEWS == "1"`) the method returns
-    /// immediately without making any network call.
-    ///
     /// - Throws: An error if there is an issue with the network request or if the response is not successful.
     func performAsync() async throws -> Void {
-        #if DEBUG
-        if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
-            return
-        }
-        #endif
 
         // check if connected to internet
         if Self.isConnectedToInternet {
@@ -244,20 +228,10 @@ public extension SuccessTargetType {
 
     /// Performs a recurring asynchronous network request and returns a stream of Void.
     ///
-    /// In **SwiftUI Previews** (`XCODE_RUNNING_FOR_PREVIEWS == "1"`) the stream yields
-    /// one `Void` value and finishes without making any network call.
-    ///
     /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
     /// - Returns: An `AsyncThrowingStream` supplying completion events continuously.
     func performAsyncStream(repeatingEveryMinutes minutes: Double) -> AsyncThrowingStream<Void, Error> {
         AsyncThrowingStream { continuation in
-            #if DEBUG
-            if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
-                continuation.yield(())
-                continuation.finish()
-                return
-            }
-            #endif
 
             let task = Task {
                 do {
