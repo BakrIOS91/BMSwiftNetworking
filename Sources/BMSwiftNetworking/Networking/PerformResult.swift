@@ -53,9 +53,9 @@ public extension ModelTargetType {
     }
     
     /// Performs a recurring asynchronous network request and returns the stream of `Result` types.
-    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Parameter seconds: The interval in seconds to repeat the request.
     /// - Returns: An `AsyncStream` yielding the continuous results.
-    func performResultStream(repeatingEveryMinutes minutes: Double) -> AsyncStream<Result<Response, APIError>> {
+    func performResultStream(repeatingEverySeconds seconds: Double) -> AsyncStream<Result<Response, APIError>> {
         AsyncStream { continuation in
             let task = Task {
                 // Fire immediately
@@ -64,7 +64,7 @@ public extension ModelTargetType {
                 
                 while !Task.isCancelled {
                     do {
-                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                        try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
                     } catch {
                         break // sleep interrupted, task cancelled
                     }
@@ -114,9 +114,9 @@ public extension SuccessTargetType {
     }
     
     /// Performs a recurring asynchronous network request and returns the stream of `Result` types.
-    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Parameter seconds: The interval in seconds to repeat the request.
     /// - Returns: An `AsyncStream` yielding the continuous results.
-    func performResultStream(repeatingEveryMinutes minutes: Double) -> AsyncStream<Result<Void, APIError>> {
+    func performResultStream(repeatingEverySeconds seconds: Double) -> AsyncStream<Result<Void, APIError>> {
         AsyncStream { continuation in
             let task = Task {
                 // Fire immediately
@@ -125,7 +125,7 @@ public extension SuccessTargetType {
                 
                 while !Task.isCancelled {
                     do {
-                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                        try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
                     } catch {
                         break // sleep interrupted, task cancelled
                     }

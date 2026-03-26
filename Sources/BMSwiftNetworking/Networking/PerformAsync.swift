@@ -149,7 +149,7 @@ public extension ModelTargetType {
     }
 
     /// Performs a recurring asynchronous network request and returns a stream of responses.
-    func performAsyncStream(repeatingEveryMinutes minutes: Double) -> AsyncThrowingStream<Response, Error> {
+    func performAsyncStream(repeatingEverySeconds seconds: Double) -> AsyncThrowingStream<Response, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
@@ -158,7 +158,7 @@ public extension ModelTargetType {
                     continuation.yield(initialResponse)
 
                     while !Task.isCancelled {
-                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                        try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
                         if Task.isCancelled { break }
                         let response = try await self.performAsync()
                         continuation.yield(response)
@@ -230,7 +230,7 @@ public extension SuccessTargetType {
     ///
     /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
     /// - Returns: An `AsyncThrowingStream` supplying completion events continuously.
-    func performAsyncStream(repeatingEveryMinutes minutes: Double) -> AsyncThrowingStream<Void, Error> {
+    func performAsyncStream(repeatingEverySeconds seconds: Double) -> AsyncThrowingStream<Void, Error> {
         AsyncThrowingStream { continuation in
 
             let task = Task {
@@ -240,7 +240,7 @@ public extension SuccessTargetType {
                     continuation.yield(initialResponse)
 
                     while !Task.isCancelled {
-                        try await Task.sleep(nanoseconds: UInt64(minutes * 60 * 1_000_000_000))
+                        try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
                         if Task.isCancelled { break }
                         let response: Void = try await self.performAsync()
                         continuation.yield(response)

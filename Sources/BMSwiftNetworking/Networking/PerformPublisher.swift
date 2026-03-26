@@ -43,10 +43,10 @@ public extension ModelTargetType {
     }
     
     /// Performs a recurring asynchronous network request and returns the result as a Combine `AnyPublisher`.
-    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Parameter seconds: The interval in seconds to repeat the request.
     /// - Returns: An `AnyPublisher` containing the decoded responses or an error.
-    func performPublisher(repeatingEveryMinutes minutes: Double) -> AnyPublisher<Response, APIError> {
-        let intervalSeconds = minutes * 60
+    func performPublisher(repeatingEverySeconds seconds: Double) -> AnyPublisher<Response, APIError> {
+        let intervalSeconds = seconds
         return Timer.publish(every: intervalSeconds, on: .main, in: .common)
             .autoconnect()
             .prepend(Date())
@@ -93,10 +93,10 @@ public extension SuccessTargetType {
     }
     
     /// Performs a recurring asynchronous network request and returns the result as a Combine `AnyPublisher`.
-    /// - Parameter minutes: The interval in minutes to repeat the request (e.g., 0.5 for 30 seconds).
+    /// - Parameter seconds: The interval in seconds to repeat the request.
     /// - Returns: An `AnyPublisher` indicating success or an error.
-    func performPublisher(repeatingEveryMinutes minutes: Double) -> AnyPublisher<Void, APIError> {
-        let intervalSeconds = minutes * 60
+    func performPublisher(repeatingEverySeconds seconds: Double) -> AnyPublisher<Void, APIError> {
+        let intervalSeconds = seconds
         return Timer.publish(every: intervalSeconds, on: .main, in: .common)
             .autoconnect()
             .prepend(Date())
